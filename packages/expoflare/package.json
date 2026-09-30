@@ -1,0 +1,59 @@
+{
+  "name": "expoflare",
+  "version": "0.1.0",
+  "description": "Deploy Expo web exports (static, single-page, or server with API routes) to your own Cloudflare Workers account.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "expo",
+    "expo-router",
+    "cloudflare",
+    "cloudflare-workers",
+    "wrangler",
+    "api-routes"
+  ],
+  "bin": {
+    "expoflare": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test 'test/**/*.test.ts'"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  },
+  "peerDependencies": {
+    "expo-server": ">=54.0.0",
+    "wrangler": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-server": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "expo-server": "~57.0.3",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.145.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

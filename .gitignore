@@ -1,0 +1,11 @@
+node_modules
+dist
+.expo
+.expoflare
+.wrangler
+.dev.vars*
+!.dev.vars.example
+*.tsbuildinfo
+expo-env.d.ts
+.DS_Store
+*.log

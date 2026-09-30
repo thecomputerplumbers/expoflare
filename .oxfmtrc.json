@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "endOfLine": "lf",
+  "semi": false,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "dist/",
+    ".expo/",
+    ".expoflare/",
+    ".wrangler/",
+    "node_modules/",
+    "**/expo-env.d.ts",
+    "pnpm-lock.yaml"
+  ]
+}

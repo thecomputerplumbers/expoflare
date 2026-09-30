@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "expoflare-example-basic",
+  "compatibility_date": "2026-09-30",
+  "vars": {
+    "GREETING": "hello from wrangler vars",
+  },
+}

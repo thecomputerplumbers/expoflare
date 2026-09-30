@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "expoflare-example-basic",
+    "slug": "expoflare-example-basic",
+    "scheme": "expoflare-example",
+    "web": {
+      "output": "server"
+    },
+    "plugins": ["expo-router"]
+  }
+}

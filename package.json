@@ -1,0 +1,21 @@
+{
+  "name": "expoflare-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter expoflare build",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "pnpm --filter expoflare typecheck",
+    "test": "pnpm --filter expoflare test",
+    "test:e2e": "pnpm build && node scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0"
+  },
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22"
+  }
+}
