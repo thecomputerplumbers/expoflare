@@ -122,7 +122,7 @@ export function generateConfig(input: GeneratedConfigInput): WranglerConfig {
       // Metro emits API routes and the SSR renderer as CommonJS bundles.
       { type: "CommonJS", globs: ["_expo/**/*.js"], fallthrough: false },
       // Pre-rendered pages and routes.json, read by expo-server as text.
-      { type: "Text", globs: ["**/*.html", "**/*.json"], fallthrough: false },
+      { type: "Text", globs: ["**/*.html", "**/*.json"], fallthrough: true },
       ...(Array.isArray(userRules) ? userRules : []),
     ]
   }

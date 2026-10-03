@@ -14,11 +14,15 @@ const built = spawnSync("pnpm", ["exec", "expoflare", "build"], {
 })
 if (built.status !== 0) process.exit(built.status ?? 1)
 
-const dev = spawn("pnpm", ["exec", "wrangler", "dev", "--port", String(port)], {
-  cwd,
-  stdio: ["ignore", "pipe", "inherit"],
-  detached: true,
-})
+const dev = spawn(
+  "pnpm",
+  ["exec", "wrangler", "dev", "--port", String(port), "--inspector-port", "0"],
+  {
+    cwd,
+    stdio: ["ignore", "pipe", "inherit"],
+    detached: true,
+  }
+)
 let devLog = ""
 dev.stdout.on("data", (chunk) => (devLog += chunk))
 
