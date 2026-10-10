@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "expoflare-example-updates",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-30",
+  // Where bundles, assets, and update records live.
+  "r2_buckets": [
+    { "binding": "UPDATES", "bucket_name": "expoflare-example-updates" },
+  ],
+  // Secrets: `wrangler secret put UPDATES_TOKEN` (and UPDATES_SIGNING_KEY for
+  // code signing). Locally they come from .dev.vars.
+}

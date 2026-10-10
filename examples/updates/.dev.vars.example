@@ -1,0 +1,5 @@
+UPDATES_TOKEN="a long random string"
+# Optional: the private key from `npx expo-updates codesigning:generate`.
+# UPDATES_SIGNING_KEY="-----BEGIN RSA PRIVATE KEY-----
+# ...
+# -----END RSA PRIVATE KEY-----"

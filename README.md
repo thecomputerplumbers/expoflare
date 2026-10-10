@@ -7,8 +7,11 @@ Docs: [packages/expoflare/README.md](packages/expoflare/README.md)
 ## Repo layout
 
 - `packages/expoflare`: the published package (the `expoflare` CLI and `expoflare/runtime`)
+- `packages/expoflare-updates`: self-hosted Expo over-the-air updates (a mountable handler, R2/KV storage, a publish CLI). Docs: [packages/expoflare-updates/README.md](packages/expoflare-updates/README.md)
 - `examples/basic`: an Expo Router app with server output, pages, and API routes
+- `examples/updates`: a Worker that serves updates from R2
 - `scripts/e2e.mjs`: builds the example and tests it under `wrangler dev`
+- `scripts/e2e-updates.mjs`: publishes an iOS export of `examples/basic` to `examples/updates` under `wrangler dev` and reads it back
 
 ## Develop
 

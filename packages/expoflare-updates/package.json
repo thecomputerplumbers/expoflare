@@ -1,0 +1,45 @@
+{
+  "name": "expoflare-updates",
+  "version": "0.1.0",
+  "description": "Self-hosted Expo over-the-air updates on your own Cloudflare Worker: a mountable Expo Updates protocol handler, pluggable storage (R2, KV), and a publish CLI.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "expo",
+    "expo-updates",
+    "ota",
+    "cloudflare",
+    "cloudflare-workers",
+    "r2"
+  ],
+  "bin": {
+    "expoflare-updates": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./publish": {
+      "types": "./dist/publish.d.ts",
+      "default": "./dist/publish.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test 'test/**/*.test.ts'"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
