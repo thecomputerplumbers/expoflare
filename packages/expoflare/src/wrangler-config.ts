@@ -125,6 +125,10 @@ export function generateConfig(input: GeneratedConfigInput): WranglerConfig {
       { type: "Text", globs: ["**/*.html", "**/*.json"], fallthrough: true },
       ...(Array.isArray(userRules) ? userRules : []),
     ]
+  } else if (Array.isArray(userRules)) {
+    // A custom entry with static or single output is bundled from source:
+    // keep its module rules (e.g. .sql imported as Text).
+    config.rules = userRules
   }
 
   return config
