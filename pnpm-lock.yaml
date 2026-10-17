@@ -212,12 +212,12 @@ importers:
         specifier: ~0.21.0
         version: 0.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     devDependencies:
+      '@thecomputerplumbers/expoflare':
+        specifier: workspace:*
+        version: link:../../packages/expoflare
       '@types/react':
         specifier: ~19.2.2
         version: 19.2.18
-      expoflare:
-        specifier: workspace:*
-        version: link:../../packages/expoflare
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -227,7 +227,7 @@ importers:
 
   examples/updates:
     devDependencies:
-      expoflare-updates:
+      '@thecomputerplumbers/expoflare-updates':
         specifier: workspace:*
         version: link:../../packages/expoflare-updates
       wrangler:
