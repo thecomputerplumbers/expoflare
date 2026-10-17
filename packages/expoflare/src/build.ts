@@ -177,7 +177,7 @@ function entrySource(entry: string, userMain: string | null): string {
 export { default } from ${JSON.stringify(spec)}
 `
   }
-  return `${header}import { createExpoHandler } from "expoflare/runtime"
+  return `${header}import { createExpoHandler } from "@thecomputerplumbers/expoflare/runtime"
 
 const handler = createExpoHandler()
 

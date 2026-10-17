@@ -3,7 +3,7 @@
 Deploy an Expo web app to **your own Cloudflare account**: static sites, single-page apps, or Expo Router with API routes and server rendering.
 
 ```sh
-npx expoflare build   # expo export -p web, then package for Workers
+npx @thecomputerplumbers/expoflare build   # expo export -p web, then package for Workers
 npx wrangler deploy   # or: wrangler dev
 ```
 
@@ -12,7 +12,7 @@ expoflare doesn't reimplement Expo's server. Server output runs on [`expo-server
 ## Install
 
 ```sh
-npm install -D expoflare wrangler
+npm install -D @thecomputerplumbers/expoflare wrangler
 npx expo install expo-server   # only for "web.output": "server"
 ```
 
@@ -48,7 +48,7 @@ Set `main` in `wrangler.jsonc` to your own Worker. Call `createExpoHandler` for 
 
 ```ts
 // worker.ts
-import { createExpoHandler } from "expoflare/runtime"
+import { createExpoHandler } from "@thecomputerplumbers/expoflare/runtime"
 
 const expo = createExpoHandler<Env>()
 

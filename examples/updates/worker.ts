@@ -2,7 +2,7 @@ import {
   createUpdatesHandler,
   r2Storage,
   type R2BucketLike,
-} from "expoflare-updates"
+} from "@thecomputerplumbers/expoflare-updates"
 
 interface Env {
   UPDATES: R2BucketLike

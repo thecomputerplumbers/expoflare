@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "expoflare": "workspace:*",
+    "@thecomputerplumbers/expoflare": "workspace:*",
     "typescript": "~6.0.3",
     "wrangler": "^4.145.0"
   }

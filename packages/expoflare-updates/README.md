@@ -13,14 +13,17 @@ It works with or without [`expoflare`](../expoflare): the handler is a plain `(r
 ## Install
 
 ```sh
-npm install expoflare-updates
+npm install @thecomputerplumbers/expoflare-updates
 ```
 
 ## Mount the handler
 
 ```ts
 // worker.ts
-import { createUpdatesHandler, r2Storage } from "expoflare-updates"
+import {
+  createUpdatesHandler,
+  r2Storage,
+} from "@thecomputerplumbers/expoflare-updates"
 
 const updates = createUpdatesHandler<Env>({
   storage: (env) => r2Storage(env.UPDATES),
@@ -76,7 +79,7 @@ kvStorage(env.UPDATES_KV) // small bundles only: 25 MiB values, eventually consi
 Anything with `get` and `put` works:
 
 ```ts
-import type { UpdatesStorage } from "expoflare-updates"
+import type { UpdatesStorage } from "@thecomputerplumbers/expoflare-updates"
 
 const storage: UpdatesStorage = {
   async get(key) {
@@ -123,7 +126,7 @@ EAS Build sets `expo-channel-name` from the build profile's `channel`; without E
 export EXPOFLARE_UPDATES_URL=https://my-app.example/updates
 export EXPOFLARE_UPDATES_TOKEN=...
 
-npx expoflare-updates publish --channel production --platform ios --message "Fix the header"
+npx @thecomputerplumbers/expoflare-updates publish --channel production --platform ios --message "Fix the header"
 ```
 
 `publish`:
@@ -139,10 +142,10 @@ An app only gets an update published for **its** runtime version. If the fingerp
 
 ```sh
 # Serve an earlier update again (publish prints each id)
-npx expoflare-updates rollback --channel production --platform ios --to <update id>
+npx @thecomputerplumbers/expoflare-updates rollback --channel production --platform ios --to <update id>
 
 # Send apps back to the bundle embedded in their build
-npx expoflare-updates rollback --channel production --platform ios
+npx @thecomputerplumbers/expoflare-updates rollback --channel production --platform ios
 ```
 
 Rolling back to an earlier update republishes its bundle under a new id and time, because the client only takes an update newer than the one it runs.
@@ -162,7 +165,7 @@ expoflare-updates rollback --channel <name> --platform <ios|android|all> [--to <
   --skip-export           Publish an existing export
 ```
 
-The same functions are importable: `import { publish, rollback } from "expoflare-updates/publish"`.
+The same functions are importable: `import { publish, rollback } from "@thecomputerplumbers/expoflare-updates/publish"`.
 
 ## Code signing
 
