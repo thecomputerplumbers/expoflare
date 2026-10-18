@@ -17,6 +17,10 @@ expoflare packages `expo export -p web` output for Cloudflare Workers. It does n
 - A signature covers the exact bytes of its multipart part. Sign the string that is sent; never re-serialize after signing.
 - Storage keys (`assets/`, `updates/`, `channels/`) are a format deployed buckets already hold. Add keys; don't rename them.
 
+## Commits and releases
+
+PR titles are Conventional Commits (squash-merged; release-please builds versions and changelogs from them). See CONTRIBUTING.md. Never bump versions or publish by hand.
+
 ## Checks
 
 `mise run check` runs the unit tests. Anything that changes the build output or the runtime also needs `pnpm test:e2e`, which runs a real `expo export` and `wrangler dev`, for both packages.

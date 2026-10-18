@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "3a79c8e10eacb342a86c5b9219cc50eeed2f6317",
+  "release-type": "node",
+  "include-component-in-tag": true,
+  "include-v-in-tag": true,
+  "tag-separator": "-",
+  "separate-pull-requests": false,
+  "packages": {
+    "packages/expoflare": {
+      "component": "expoflare",
+      "changelog-path": "CHANGELOG.md"
+    },
+    "packages/expoflare-updates": {
+      "component": "expoflare-updates",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
+}

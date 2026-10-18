@@ -1,0 +1,56 @@
+name: Release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    outputs:
+      expoflare: ${{ steps.release.outputs['packages/expoflare--release_created'] }}
+      expoflare-updates: ${{ steps.release.outputs['packages/expoflare-updates--release_created'] }}
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      # Pushes made with GITHUB_TOKEN don't trigger other workflows, so start
+      # the checks on the release PR explicitly.
+      - name: Check the release PR
+        if: steps.release.outputs.pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+        run: gh workflow run check.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.expoflare == 'true' || needs.release-please.outputs.expoflare-updates == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC) and provenance
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - run: pnpm install --frozen-lockfile
+      - run: mise run check
+      - name: Publish @thecomputerplumbers/expoflare
+        if: needs.release-please.outputs.expoflare == 'true'
+        working-directory: packages/expoflare
+        run: npm publish --provenance --access public
+      - name: Publish @thecomputerplumbers/expoflare-updates
+        if: needs.release-please.outputs.expoflare-updates == 'true'
+        working-directory: packages/expoflare-updates
+        run: npm publish --provenance --access public
