@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish any package whose package.json version is not on npm yet (from the selected ref)"
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -35,7 +40,7 @@ jobs:
 
   publish:
     needs: release-please
-    if: needs.release-please.outputs.expoflare == 'true' || needs.release-please.outputs.expoflare-updates == 'true'
+    if: needs.release-please.outputs.expoflare == 'true' || needs.release-please.outputs.expoflare-updates == 'true' || inputs.publish
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,11 +50,13 @@ jobs:
       - uses: jdx/mise-action@v4
       - run: pnpm install --frozen-lockfile
       - run: mise run check
+      # Publishing is idempotent: a version already on npm is skipped, so a
+      # manual run with `publish` can recover a release whose publish failed.
       - name: Publish @thecomputerplumbers/expoflare
-        if: needs.release-please.outputs.expoflare == 'true'
+        if: needs.release-please.outputs.expoflare == 'true' || inputs.publish
         working-directory: packages/expoflare
-        run: npm publish --provenance --access public
+        run: ../../scripts/publish-if-unpublished.sh
       - name: Publish @thecomputerplumbers/expoflare-updates
-        if: needs.release-please.outputs.expoflare-updates == 'true'
+        if: needs.release-please.outputs.expoflare-updates == 'true' || inputs.publish
         working-directory: packages/expoflare-updates
-        run: npm publish --provenance --access public
+        run: ../../scripts/publish-if-unpublished.sh
