@@ -14,6 +14,7 @@
     ".wrangler/",
     "node_modules/",
     "**/expo-env.d.ts",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
+    "CHANGELOG.md"
   ]
 }
