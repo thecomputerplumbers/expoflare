@@ -20,3 +20,28 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: mise run check
       - run: pnpm test:e2e
+
+  # Required checks on main only count check runs from pull_request events, so
+  # the runs that release.yml dispatches on release-please PRs don't satisfy
+  # them. Mirror those results as commit statuses with the same names.
+  report:
+    if: always() && github.event_name == 'workflow_dispatch'
+    needs: [check]
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Report results as commit statuses
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          for job in $(jq -r 'keys[]' <<<"$RESULTS"); do
+            result=$(jq -r --arg j "$job" '.[$j].result' <<<"$RESULTS")
+            state=failure
+            [ "$result" = success ] && state=success
+            gh api "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+              -f state="$state" -f context="$job" -f target_url="$url" \
+              -f description="workflow_dispatch: $result"
+          done
