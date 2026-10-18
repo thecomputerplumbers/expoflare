@@ -28,11 +28,10 @@ jobs:
       # Pushes made with GITHUB_TOKEN don't trigger other workflows, so start
       # the checks on the release PR explicitly.
       - name: Check the release PR
-        if: steps.release.outputs.pr
+        if: steps.release.outputs.pr != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
-        run: gh workflow run check.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+        run: gh workflow run check.yml --repo "$GITHUB_REPOSITORY" --ref release-please--branches--main
 
   publish:
     needs: release-please
