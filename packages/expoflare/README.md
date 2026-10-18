@@ -35,7 +35,7 @@ Assets-only Workers run no code on requests. On Cloudflare, static asset request
 1. Runs `expo export --platform web` (skip it with `--skip-export`).
 2. Copies the client output to `.expoflare/assets`. It adds a long-lived `Cache-Control` for the content-hashed `/_expo/static/*` files, unless you ship your own `_headers`.
 3. For server output, copies `dist/server` to `.expoflare/worker` and writes an entry that calls `expo-server`. API routes, `routes.json`, and pre-rendered HTML are uploaded as Worker modules, because `expo-server` loads them with dynamic `import()`.
-4. Writes `.expoflare/wrangler.json` from your `wrangler.jsonc`, keeping your bindings, vars, routes, and environments.
+4. Writes `.expoflare/wrangler.json` from your `wrangler.jsonc`, keeping your bindings, vars, and routes. If you build for an environment, its settings are applied first (see [Environments](#environments)).
 5. Writes `.wrangler/deploy/config.json`, which tells wrangler to use the generated config. This is the same mechanism the Cloudflare Vite plugin uses, so plain `wrangler dev`, `wrangler deploy`, and `wrangler versions upload` work unchanged.
 
 If there's no `wrangler.jsonc`, the first build creates one. It's yours to edit from then on.
@@ -77,10 +77,21 @@ export { MyDurableObject } from "./durable-object"
 
 With server output, expoflare re-exports your entry from `.expoflare/worker/index.js`, so named exports like Durable Object classes keep working. With static output, your entry is used directly and `assets` is served in front of it.
 
+## Environments
+
+wrangler doesn't accept environments in a generated config, so expoflare picks the environment when it builds. Pass the name to `expoflare build` and then to wrangler:
+
+```sh
+expoflare build --env production
+wrangler deploy --env production
+```
+
+`--env` defaults to `CLOUDFLARE_ENV`, so setting that once covers both commands. The build applies `env.production` the way wrangler does: settings like `routes`, `main`, and `rules` override the top level, bindings and `vars` come only from the environment, and the Worker is named `<name>-production` unless the environment sets `name`. Without `--env`, the top level is used and `env` is ignored. Deploying with a different `--env` than the build used fails, so rebuild when you switch.
+
 ## CLI
 
 ```
-expoflare build [--root <dir>] [--dist <dir>] [--skip-export] [-- <expo export args>]
+expoflare build [--root <dir>] [--dist <dir>] [--env <name>] [--skip-export] [-- <expo export args>]
 ```
 
 ## vs. EAS Hosting

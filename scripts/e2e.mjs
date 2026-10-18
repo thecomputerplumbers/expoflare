@@ -62,6 +62,23 @@ try {
   process.kill(-dev.pid)
 }
 
+// wrangler rejects a generated config with environments; expoflare resolves
+// the selected one at build time.
+const envBuild = spawnSync(
+  "pnpm",
+  ["exec", "expoflare", "build", "--skip-export", "--env", "production"],
+  { cwd, stdio: "inherit" }
+)
+assert.equal(envBuild.status, 0)
+const dryRun = spawnSync(
+  "pnpm",
+  ["exec", "wrangler", "deploy", "--dry-run", "--env", "production"],
+  { cwd, encoding: "utf8" }
+)
+assert.equal(dryRun.status, 0, dryRun.stdout + dryRun.stderr)
+assert.match(dryRun.stdout, /hello from production/)
+console.log("e2e: env build passed")
+
 async function waitForServer() {
   for (let i = 0; i < 120; i++) {
     try {

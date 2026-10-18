@@ -14,6 +14,7 @@ import {
   findUserConfig,
   generateConfig,
   readUserConfig,
+  resolveEnvironment,
   writeStarterConfig,
 } from "./wrangler-config.ts"
 
@@ -26,6 +27,11 @@ export interface BuildOptions {
   skipExport?: boolean
   /** Extra arguments passed to `expo export`. */
   exportArgs?: string[]
+  /**
+   * wrangler environment (`env.<name>` in wrangler.jsonc) to build for.
+   * Defaults to `CLOUDFLARE_ENV`. Pass the same name to `wrangler deploy`.
+   */
+  env?: string
   log?: (message: string) => void
 }
 
@@ -64,10 +70,13 @@ export function build(options: BuildOptions = {}): BuildResult {
     log(`Created ${path.relative(root, userConfigPath)}`)
   }
   const userConfig = readUserConfig(userConfigPath)
+  const envName = options.env || process.env.CLOUDFLARE_ENV || undefined
+  if (envName) log(`wrangler environment: ${envName}`)
 
+  const envConfig = resolveEnvironment(userConfig, envName)
   const userMain =
-    typeof userConfig.main === "string"
-      ? path.resolve(path.dirname(userConfigPath), userConfig.main)
+    typeof envConfig.main === "string"
+      ? path.resolve(path.dirname(userConfigPath), envConfig.main)
       : null
   if (userMain && !existsSync(userMain)) {
     throw new Error(
@@ -101,6 +110,7 @@ export function build(options: BuildOptions = {}): BuildResult {
     assetsDir,
     entry,
     modulesDir,
+    envName,
   })
   const configPath = path.join(outDir, "wrangler.json")
   writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`)
