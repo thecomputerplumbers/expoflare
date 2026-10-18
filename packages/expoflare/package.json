@@ -1,6 +1,6 @@
 {
   "name": "@thecomputerplumbers/expoflare",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deploy Expo web exports (static, single-page, or server with API routes) to your own Cloudflare Workers account.",
   "license": "MIT",
   "type": "module",
