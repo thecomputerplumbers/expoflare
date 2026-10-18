@@ -5,4 +5,11 @@
   "vars": {
     "GREETING": "hello from wrangler vars",
   },
+  "env": {
+    "production": {
+      "vars": {
+        "GREETING": "hello from production",
+      },
+    },
+  },
 }

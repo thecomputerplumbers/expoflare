@@ -55,6 +55,110 @@ export function writeStarterConfig(root: string, name: string): string {
   return file
 }
 
+/**
+ * Keys wrangler doesn't inherit from the top level into an environment
+ * (bindings, vars, and the like). Everything else is inherited unless the
+ * environment sets it. Mirrors `notInheritable` in wrangler's config
+ * normalization.
+ */
+const NOT_INHERITABLE = new Set([
+  "vars",
+  "secrets",
+  "define",
+  "durable_objects",
+  "workflows",
+  "kv_namespaces",
+  "r2_buckets",
+  "d1_databases",
+  "cloudchamber",
+  "containers",
+  "send_email",
+  "queues",
+  "connect",
+  "vectorize",
+  "ai_search_namespaces",
+  "ai_search",
+  "agent_memory",
+  "hyperdrive",
+  "services",
+  "analytics_engine_datasets",
+  "dispatch_namespaces",
+  "mtls_certificates",
+  "tail_consumers",
+  "streaming_tail_consumers",
+  "unsafe",
+  "browser",
+  "analytics",
+  "ai",
+  "images",
+  "stream",
+  "media",
+  "pipelines",
+  "secrets_store_secrets",
+  "artifacts",
+  "unsafe_hello_world",
+  "flagship",
+  "worker_loaders",
+  "ratelimits",
+  "vpc_services",
+  "vpc_networks",
+  "version_metadata",
+])
+
+/**
+ * wrangler rejects a redirected config that has environments, so the
+ * environment is picked at build time: its settings are folded over the top
+ * level the way wrangler would, and `env` is dropped. With no environment
+ * selected, the top level is used as is.
+ */
+export function resolveEnvironment(
+  userConfig: WranglerConfig,
+  envName: string | undefined
+): WranglerConfig {
+  const { env, ...topLevel } = userConfig
+  const envs = isRecord(env) ? env : {}
+  if (!envName) return topLevel
+
+  const rawEnv = envs[envName]
+  if (rawEnv === undefined) {
+    const names = Object.keys(envs)
+    if (names.length > 0) {
+      throw new Error(
+        `No environment named "${envName}" in the wrangler config. Available: ${names.join(", ")}.`
+      )
+    }
+    // wrangler warns and uses the top level, still deploying to <name>-<env>.
+    return withEnvName(topLevel, undefined, envName)
+  }
+  if (!isRecord(rawEnv)) {
+    throw new Error(
+      `"env.${envName}" in the wrangler config must be an object.`
+    )
+  }
+
+  const resolved: WranglerConfig = {}
+  for (const [key, value] of Object.entries(topLevel)) {
+    if (!NOT_INHERITABLE.has(key)) resolved[key] = value
+  }
+  Object.assign(resolved, rawEnv)
+  return withEnvName(resolved, rawEnv.name, envName, topLevel.name)
+}
+
+function withEnvName(
+  config: WranglerConfig,
+  envLevelName: unknown,
+  envName: string,
+  topLevelName: unknown = config.name
+): WranglerConfig {
+  // An environment deploys as its own Worker, "<name>-<env>", unless it sets
+  // a name.
+  if (typeof envLevelName === "string") return { ...config, name: envLevelName }
+  if (typeof topLevelName === "string" && topLevelName) {
+    return { ...config, name: `${topLevelName}-${envName}` }
+  }
+  return config
+}
+
 export interface GeneratedConfigInput {
   userConfig: WranglerConfig
   userConfigPath: string
@@ -66,16 +170,19 @@ export interface GeneratedConfigInput {
   entry: string | null
   /** Directory of Worker modules loaded at runtime by the entry. */
   modulesDir: string | null
+  /** wrangler environment to build for (`env.<name>`), if any. */
+  envName?: string
 }
 
 /**
  * Builds the config wrangler reads in place of the user's through
- * `.wrangler/deploy/config.json`. The user's bindings, vars, routes, and
- * environments pass through; expoflare owns the entry, assets, and module
- * rules.
+ * `.wrangler/deploy/config.json`. The user's bindings, vars, and routes pass
+ * through, resolved for the selected environment; expoflare owns the entry,
+ * assets, and module rules.
  */
 export function generateConfig(input: GeneratedConfigInput): WranglerConfig {
-  const { userConfig, outDir } = input
+  const { outDir } = input
+  const userConfig = resolveEnvironment(input.userConfig, input.envName)
   const userDir = path.dirname(input.userConfigPath)
   const rel = (to: string) => toPosix(path.relative(outDir, to)) || "."
 
@@ -94,6 +201,17 @@ export function generateConfig(input: GeneratedConfigInput): WranglerConfig {
   const config: WranglerConfig = rebasePaths(rest, userDir, outDir)
 
   config.compatibility_date ??= new Date().toISOString().slice(0, 10)
+
+  // Redirected-config metadata wrangler reads in place of `env`. With it,
+  // `wrangler deploy --env <other>` fails instead of deploying the wrong build.
+  const envNames = isRecord(input.userConfig.env)
+    ? Object.keys(input.userConfig.env)
+    : []
+  if (typeof input.userConfig.name === "string") {
+    config.topLevelName = input.userConfig.name
+  }
+  if (envNames.length > 0) config.definedEnvironments = envNames
+  if (input.envName) config.targetEnvironment = input.envName
 
   const assets: Record<string, unknown> = {
     ...(isRecord(userAssets) ? userAssets : {}),
@@ -152,14 +270,6 @@ function rebasePaths(
       isRecord(db) && "migrations_dir" in db
         ? { ...db, migrations_dir: rebase(db.migrations_dir) }
         : db
-    )
-  }
-  if (isRecord(out.env)) {
-    out.env = Object.fromEntries(
-      Object.entries(out.env).map(([name, env]) => [
-        name,
-        isRecord(env) ? rebasePaths(env, fromDir, toDir) : env,
-      ])
     )
   }
   return out

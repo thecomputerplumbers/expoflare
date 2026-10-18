@@ -15,6 +15,7 @@ Options
   --root <dir>     Expo project root (default: .)
   --dist <dir>     expo export output directory (default: dist)
   --skip-export    Package an existing export instead of running expo export
+  -e, --env <name> wrangler environment to build for (default: $CLOUDFLARE_ENV)
   -h, --help       Show this help
   -v, --version    Show the version
 `
@@ -25,6 +26,7 @@ const { values, positionals } = parseArgs({
     root: { type: "string" },
     dist: { type: "string" },
     "skip-export": { type: "boolean" },
+    env: { type: "string", short: "e" },
     help: { type: "boolean", short: "h" },
     version: { type: "boolean", short: "v" },
   },
@@ -55,6 +57,7 @@ try {
     distDir: values.dist,
     skipExport: values["skip-export"],
     exportArgs: rest,
+    env: values.env,
     log: (message) => console.log(`[expoflare] ${message}`),
   })
 } catch (error) {
