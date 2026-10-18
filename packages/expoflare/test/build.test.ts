@@ -146,3 +146,18 @@ test("keeps user bindings and flags and rebases their paths", () => {
   )
   assert.equal(config.main, undefined)
 })
+
+test("custom main with single output keeps the user's module rules", () => {
+  const rules = [{ type: "Text", globs: ["**/*.sql"], fallthrough: true }]
+  const config = generateConfig({
+    userConfig: { name: "app", main: "src/worker.ts", rules },
+    userConfigPath: "/app/wrangler.jsonc",
+    outDir: "/app/.expoflare",
+    mode: "single",
+    assetsDir: "/app/.expoflare/assets",
+    entry: "/app/src/worker.ts",
+    modulesDir: null,
+  })
+  assert.equal(config.main, "../src/worker.ts")
+  assert.deepEqual(config.rules, rules)
+})
