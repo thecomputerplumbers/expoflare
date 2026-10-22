@@ -11,8 +11,21 @@ concurrency:
   group: check-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  check:
+  route:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      id-token: write
+    outputs:
+      runner: ${{ steps.hive.outputs.runner }}
+    steps:
+      # Your hive when one of its machines is free, ubuntu-latest when none is.
+      - id: hive
+        uses: thecomputerplumbers/hiverunner/route@v1
+
+  check:
+    needs: route
+    runs-on: ${{ needs.route.outputs.runner }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
